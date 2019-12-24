@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch import nn
 
 from .inference import make_fcos_postprocessor
-from .loss import make_fcos_loss_evaluator
+from .loss import make_dna_loss_evaluator
 
 from fcos_core.layers import Scale
 from fcos_core.layers import DFConv2d
@@ -67,10 +67,13 @@ class DNAHead(torch.nn.Module):
         )
 
         
+    
         self.bbox_pred = nn.Conv2d(
             in_channels, 4, kernel_size=3, stride=1,
             padding=1
         )
+        
+
         self.centerness = nn.Conv2d(
             in_channels, 1, kernel_size=3, stride=1,
             padding=1
@@ -91,39 +94,68 @@ class DNAHead(torch.nn.Module):
         torch.nn.init.constant_(self.cls_logits.bias, bias_value)
 
         self.scales = nn.ModuleList([Scale(init_value=1.0) for _ in range(5)])
+       
+        
+        # For DNA. way 1.
+        """
+        self.H = [100, 50, 25, 13, 7]
+        self.W = [168, 84, 42, 21, 11]
 
-        # TODO check here
-        self.consistency = nn.ModuleList([nn.Conv2d(
-            in_channels, l + 10, kernel_size=3, stride=1,
+        self.identity = nn.ModuleList([nn.Conv2d(
+            in_channels, self.H[l] * self.W[l], kernel_size=3, 
+            stride=1, padding=1) for l in range(5)])
+
+        self.dnabox_pred = nn.ModuleList([nn.Conv2d(
+            self.H[l] * self.W[l], 4, kernel_size=3, stride=1,
             padding=1) for l in range(5)])
 
-        self.bbox_pred = nn.ModuleList([nn.Conv2d(
-            l + 10, 4, kernel_size=3, stride=1,
-            padding=1) for l in range(5)])
+        # NOTE need to init params.
+        for modules in self.identity:
+            for l in modules.modules():
+                if isinstance(l, nn.Conv2d):
+                    torch.nn.init.normal_(l.weight, std=0.01)
+                    torch.nn.init.constant_(l.bias, 0)
+
+        for modules in self.dnabox_pred:
+            for l in modules.modules():
+                if isinstance(l, nn.Conv2d):
+                    torch.nn.init.normal_(l.weight, std=0.01)
+                    torch.nn.init.constant_(l.bias, 0)
+        """
+    
+        # For DNA. way 2.
+        self.hash_code = 128
+        
+        self.identity = nn.Conv2d(
+            in_channels, self.hash_code, kernel_size=3, 
+            stride=1, padding=1)
+
+        # NOTE need to init params.
+        for modules in [self.identity]:
+            for l in modules.modules():
+                if isinstance(l, nn.Conv2d):
+                    torch.nn.init.normal_(l.weight, std=0.01)
+                    torch.nn.init.constant_(l.bias, 0)  
 
     def forward(self, x):
         logits = []
         bbox_reg = []
         centerness = []
+        identity = []
         for l, feature in enumerate(x):
             cls_tower = self.cls_tower(feature)
-
-            # embedding the location feature
             box_tower = self.bbox_tower(feature)
 
             logits.append(self.cls_logits(cls_tower))
-            
-            # TODO check if centerness on reg / cls
             if self.centerness_on_reg:
                 centerness.append(self.centerness(box_tower))
             else:
                 centerness.append(self.centerness(cls_tower))
 
-            instance_consistency = self.consistency[l](box_tower)
-            instance_consistency = torch.permute(instance_consistency, [0, 2, 3, 1]).reshape([-1, h * w, h, w])
+            if True:
+                identity.append(self.identity(box_tower))
 
-            bbox_pred = self.scales[l](self.bbox_pred[l](instance_consistency))
-            
+            bbox_pred = self.scales[l](self.bbox_pred(box_tower))
             if self.norm_reg_targets:
                 bbox_pred = F.relu(bbox_pred)
                 if self.training:
@@ -133,7 +165,7 @@ class DNAHead(torch.nn.Module):
             else:
                 bbox_reg.append(torch.exp(bbox_pred))
 
-        return logits, bbox_reg, centerness
+        return logits, bbox_reg, centerness, identity
 
 
 class DNAModule(torch.nn.Module):
@@ -149,7 +181,7 @@ class DNAModule(torch.nn.Module):
 
         box_selector_test = make_fcos_postprocessor(cfg)
 
-        loss_evaluator = make_fcos_loss_evaluator(cfg)
+        loss_evaluator = make_dna_loss_evaluator(cfg)
         self.head = head
         self.box_selector_test = box_selector_test
         self.loss_evaluator = loss_evaluator
@@ -170,14 +202,16 @@ class DNAModule(torch.nn.Module):
             losses (dict[Tensor]): the losses for the model during training. During
                 testing, it is an empty dict.
         """
-        box_cls, box_regression, centerness = self.head(features)
+        box_cls, box_regression, centerness, identity = self.head(features)
         locations = self.compute_locations(features)
- 
+
         if self.training:
             return self._forward_train(
                 locations, box_cls, 
                 box_regression, 
-                centerness, targets
+                centerness, 
+                identity,
+                targets
             )
         else:
             return self._forward_test(
@@ -185,14 +219,15 @@ class DNAModule(torch.nn.Module):
                 centerness, images.image_sizes
             )
 
-    def _forward_train(self, locations, box_cls, box_regression, centerness, targets):
-        loss_box_cls, loss_box_reg, loss_centerness = self.loss_evaluator(
-            locations, box_cls, box_regression, centerness, targets
+    def _forward_train(self, locations, box_cls, box_regression, centerness, identity, targets):
+        loss_box_cls, loss_box_reg, loss_centerness, loss_identity = self.loss_evaluator(
+            locations, box_cls, box_regression, centerness, identity, targets
         )
         losses = {
             "loss_cls": loss_box_cls,
             "loss_reg": loss_box_reg,
-            "loss_centerness": loss_centerness
+            "loss_centerness": loss_centerness,
+            "loss_identity": loss_identity,
         }
         return None, losses
 

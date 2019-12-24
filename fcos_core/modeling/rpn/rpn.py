@@ -208,6 +208,6 @@ def build_rpn(cfg, in_channels):
     if cfg.MODEL.RETINANET_ON:
         return build_retinanet(cfg, in_channels)
     if cfg.MODEL.DNA_ON:
-        return build_dna(cfg, inchannels)
+        return build_dna(cfg, in_channels)
 
     return RPNModule(cfg, in_channels)

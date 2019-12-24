@@ -1,5 +1,5 @@
 """
-This file contains specific functions for computing losses of FCOS
+This file contains specific functions for computing losses of DNA
 file
 """
 
@@ -32,30 +32,32 @@ def reduce_sum(tensor):
     return tensor
 
 
-class FCOSLossComputation(object):
+class DNALossComputation(object):
     """
-    This class computes the FCOS losses.
+    This class computes the DNA losses.
     """
 
     def __init__(self, cfg):
         self.cls_loss_func = SigmoidFocalLoss(
-            cfg.MODEL.FCOS.LOSS_GAMMA,
-            cfg.MODEL.FCOS.LOSS_ALPHA
+            cfg.MODEL.DNA.LOSS_GAMMA,
+            cfg.MODEL.DNA.LOSS_ALPHA
         )
-        self.fpn_strides = cfg.MODEL.FCOS.FPN_STRIDES
-        self.center_sampling_radius = cfg.MODEL.FCOS.CENTER_SAMPLING_RADIUS
-        self.iou_loss_type = cfg.MODEL.FCOS.IOU_LOSS_TYPE
-        self.norm_reg_targets = cfg.MODEL.FCOS.NORM_REG_TARGETS
+        self.fpn_strides = cfg.MODEL.DNA.FPN_STRIDES
+        self.center_sampling_radius = cfg.MODEL.DNA.CENTER_SAMPLING_RADIUS
+        self.iou_loss_type = cfg.MODEL.DNA.IOU_LOSS_TYPE
+        self.norm_reg_targets = cfg.MODEL.DNA.NORM_REG_TARGETS
 
         # we make use of IOU Loss for bounding boxes regression,
         # but we found that L1 in log scale can yield a similar performance
         self.box_reg_loss_func = IOULoss(self.iou_loss_type)
         self.centerness_loss_func = nn.BCEWithLogitsLoss(reduction="sum")
 
+        self.identity_loss_func = nn.BCELoss()
+
     def get_sample_region(self, gt, strides, num_points_per, gt_xs, gt_ys, radius=1.0):
         '''
         This code is from
-        https://github.com/yqyao/FCOS_PLUS/blob/0d20ba34ccc316650d8c30febb2eb40cb6eaae37/
+        https://github.com/yqyao/DNA_PLUS/blob/0d20ba34ccc316650d8c30febb2eb40cb6eaae37/
         maskrcnn_benchmark/modeling/rpn/fcos/loss.py#L42
         '''
         num_gts = gt.shape[0]
@@ -119,14 +121,15 @@ class FCOSLossComputation(object):
         num_points_per_level = [len(points_per_level) for points_per_level in points]
         self.num_points_per_level = num_points_per_level
         points_all_level = torch.cat(points, dim=0)
-        labels, reg_targets = self.compute_targets_for_locations(
+        labels, reg_targets, identities = self.compute_targets_for_locations(
             points_all_level, targets, expanded_object_sizes_of_interest
         )
 
         for i in range(len(labels)):
             labels[i] = torch.split(labels[i], num_points_per_level, dim=0)
             reg_targets[i] = torch.split(reg_targets[i], num_points_per_level, dim=0)
-
+ 
+        # cat images labels per level.
         labels_level_first = []
         reg_targets_level_first = []
         for level in range(len(points)):
@@ -142,12 +145,41 @@ class FCOSLossComputation(object):
             if self.norm_reg_targets:
                 reg_targets_per_level = reg_targets_per_level / self.fpn_strides[level]
             reg_targets_level_first.append(reg_targets_per_level)
+   
 
-        return labels_level_first, reg_targets_level_first
+        # for identities
+        identity_position_pair = []
+        identity_value_pair = []
+        for identity in identities:
+            idx = torch.where(identity != -1)[0]
+
+            N = identity.shape[0]
+            M = len(idx)
+
+            if True:
+                # This is only (pos) vs (pos) pair
+                row = idx.unsqueeze(0).repeat(len(idx), 1).unsqueeze(-1)
+                col = row.permute(1, 0, 2)
+            else:
+                # This is the (bg&pos) vs (pos) pair 
+                row = idx.unsqueeze(0).repeat(N, 1).unsqueeze(-1)
+                device = row.device
+                col = torch.tensor(range(N)).unsqueeze(-1).repeat(1, M).unsqueeze(-1).to(device)
+
+            position = torch.cat([col, row], dim=-1).reshape(-1, 2)
+
+            value = identity[position[:, 0]] == identity[position[:, 1]]
+            #sparse_pair = torch.sparse.FloatTensor(position.t(), value, torch.Size([N, N]))    
+           
+            identity_position_pair.append(position)
+            identity_value_pair.append(value)
+        
+        return labels_level_first, reg_targets_level_first, identity_position_pair, identity_value_pair
 
     def compute_targets_for_locations(self, locations, targets, object_sizes_of_interest):
         labels = []
         reg_targets = []
+        identity = []
         xs, ys = locations[:, 0], locations[:, 1]
 
         for im_i in range(len(targets)):
@@ -193,10 +225,14 @@ class FCOSLossComputation(object):
             labels_per_im = labels_per_im[locations_to_gt_inds]
             labels_per_im[locations_to_min_area == INF] = 0
 
+            # locations belong to which gt
+            locations_to_gt_inds[locations_to_min_area == INF] = -1
+            
             labels.append(labels_per_im)
             reg_targets.append(reg_targets_per_im)
+            identity.append(locations_to_gt_inds)
 
-        return labels, reg_targets
+        return labels, reg_targets, identity
 
     def compute_centerness_targets(self, reg_targets):
         left_right = reg_targets[:, [0, 2]]
@@ -205,23 +241,26 @@ class FCOSLossComputation(object):
                       (top_bottom.min(dim=-1)[0] / top_bottom.max(dim=-1)[0])
         return torch.sqrt(centerness)
 
-    def __call__(self, locations, box_cls, box_regression, centerness, targets):
+    def __call__(self, locations, box_cls, box_regression, centerness, identity, targets):
         """
         Arguments:
             locations (list[BoxList])
             box_cls (list[Tensor])
             box_regression (list[Tensor])
             centerness (list[Tensor])
+            identity (list[Tensor])
             targets (list[BoxList])
+            
 
         Returns:
             cls_loss (Tensor)
             reg_loss (Tensor)
             centerness_loss (Tensor)
+            identity_loss (Tensor)
         """
         N = box_cls[0].size(0)
         num_classes = box_cls[0].size(1)
-        labels, reg_targets = self.prepare_targets(locations, targets)
+        labels, reg_targets, position_pair, value_pair = self.prepare_targets(locations, targets)
 
         box_cls_flatten = []
         box_regression_flatten = []
@@ -279,9 +318,32 @@ class FCOSLossComputation(object):
             reduce_sum(centerness_flatten.new_tensor([0.0]))
             centerness_loss = centerness_flatten.sum()
 
-        return cls_loss, reg_loss, centerness_loss
+        # for hash identity
+        B = identity[0].shape[0]
+        matches = []
+        identity_losses = []
+        for batch_id in range(B):
+            single_img = []
+            for ids_level in identity:
+                per_img = ids_level[batch_id].reshape(128, -1) 
+                single_img.append(per_img) 
+            single_img = torch.cat(single_img, -1)
+
+            pair = position_pair[batch_id]
+            value = value_pair[batch_id].to(torch.float)
+
+            s1 = single_img[:, pair[:, 0]]       
+            s2 = single_img[:, pair[:, 1]]
+            
+            hash_match = (torch.sum(s1 * s2, 0) / (torch.norm(s1, 2, 0) * torch.norm(s2, 2, 0)))
+            # TODO. need change loss
+            identity_losses.append(self.centerness_loss_func(hash_match, value) / value.shape[0])
+            
+        identity_loss = sum(identity_losses) / B         
+       
+        return cls_loss, reg_loss, centerness_loss, identity_loss
 
 
-def make_fcos_loss_evaluator(cfg):
-    loss_evaluator = FCOSLossComputation(cfg)
+def make_dna_loss_evaluator(cfg):
+    loss_evaluator = DNALossComputation(cfg)
     return loss_evaluator
