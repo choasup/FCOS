@@ -28,4 +28,6 @@ dist/
 # project dirs
 /datasets
 /models
+
 ./datasets
+./training_dir
