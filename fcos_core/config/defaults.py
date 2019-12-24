@@ -24,6 +24,7 @@ _C.MODEL = CN()
 _C.MODEL.RPN_ONLY = False
 _C.MODEL.MASK_ON = False
 _C.MODEL.FCOS_ON = True
+_C.MODEL.DNA_ON = False
 _C.MODEL.RETINANET_ON = False
 _C.MODEL.KEYPOINT_ON = False
 _C.MODEL.DEVICE = "cuda"
@@ -311,6 +312,35 @@ _C.MODEL.FCOS.NORM_REG_TARGETS = False
 _C.MODEL.FCOS.CENTERNESS_ON_REG = False
 
 _C.MODEL.FCOS.USE_DCN_IN_TOWER = False
+
+# ---------------------------------------------------------------------------- #
+# DNA Options
+# ---------------------------------------------------------------------------- #
+_C.MODEL.DNA = CN()
+_C.MODEL.DNA.NUM_CLASSES = 81  # the number of classes including background
+_C.MODEL.DNA.FPN_STRIDES = [8, 16, 32, 64, 128]
+_C.MODEL.DNA.PRIOR_PROB = 0.01
+_C.MODEL.DNA.INFERENCE_TH = 0.05
+_C.MODEL.DNA.NMS_TH = 0.6
+_C.MODEL.DNA.PRE_NMS_TOP_N = 1000
+
+# Focal loss parameter: alpha
+_C.MODEL.DNA.LOSS_ALPHA = 0.25
+# Focal loss parameter: gamma
+_C.MODEL.DNA.LOSS_GAMMA = 2.0
+
+# the number of convolutions used in the cls and bbox tower
+_C.MODEL.DNA.NUM_CONVS = 4
+
+# if CENTER_SAMPLING_RADIUS <= 0, it will disable center sampling
+_C.MODEL.DNA.CENTER_SAMPLING_RADIUS = 0.0
+# IOU_LOSS_TYPE can be "iou", "linear_iou" or "giou"
+_C.MODEL.DNA.IOU_LOSS_TYPE = "iou"
+
+_C.MODEL.DNA.NORM_REG_TARGETS = False
+_C.MODEL.DNA.CENTERNESS_ON_REG = False
+
+_C.MODEL.DNA.USE_DCN_IN_TOWER = False
 
 # ---------------------------------------------------------------------------- #
 # RetinaNet Options (Follow the Detectron version)
