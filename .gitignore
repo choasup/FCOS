@@ -31,3 +31,4 @@ dist/
 
 training_dir/
 demo/vis/
+inference/
