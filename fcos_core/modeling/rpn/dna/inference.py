@@ -9,6 +9,7 @@ from fcos_core.structures.bounding_box import BoxList
 from fcos_core.structures.boxlist_ops import cat_boxlist
 from fcos_core.structures.boxlist_ops import boxlist_ml_nms
 from fcos_core.structures.boxlist_ops import remove_small_boxes
+from fcos_core.structures.boxlist_ops import dna_nms
 
 
 class FCOSPostProcessor(torch.nn.Module):
@@ -47,7 +48,7 @@ class FCOSPostProcessor(torch.nn.Module):
 
     def forward_for_single_feature_map(
             self, locations, box_cls,
-            box_regression, centerness,
+            box_regression, centerness, identity, 
             image_sizes):
         """
         Arguments:
@@ -64,6 +65,10 @@ class FCOSPostProcessor(torch.nn.Module):
         box_regression = box_regression.reshape(N, -1, 4)
         centerness = centerness.view(N, 1, H, W).permute(0, 2, 3, 1)
         centerness = centerness.reshape(N, -1).sigmoid()
+        
+        # NOTE. get identity
+        identity = identity.view(N, 64, H, W).permute(0, 2, 3, 1)
+        identity = identity.reshape(N, -1, 64)
 
         candidate_inds = box_cls > self.pre_nms_thresh
         pre_nms_top_n = candidate_inds.view(N, -1).sum(1)
@@ -86,6 +91,10 @@ class FCOSPostProcessor(torch.nn.Module):
             per_box_regression = per_box_regression[per_box_loc]
             per_locations = locations[per_box_loc]
 
+            # NOTE. get per identity
+            per_identity = identity[i]
+            per_identity = per_identity[per_box_loc]
+
             per_pre_nms_top_n = pre_nms_top_n[i]
 
             if per_candidate_inds.sum().item() > per_pre_nms_top_n.item():
@@ -94,6 +103,10 @@ class FCOSPostProcessor(torch.nn.Module):
                 per_class = per_class[top_k_indices]
                 per_box_regression = per_box_regression[top_k_indices]
                 per_locations = per_locations[top_k_indices]
+
+                # NOTE. get per identity
+                per_identity = per_identity[top_k_indices]
+                
 
             detections = torch.stack([
                 per_locations[:, 0] - per_box_regression[:, 0],
@@ -106,13 +119,17 @@ class FCOSPostProcessor(torch.nn.Module):
             boxlist = BoxList(detections, (int(w), int(h)), mode="xyxy")
             boxlist.add_field("labels", per_class)
             boxlist.add_field("scores", torch.sqrt(per_box_cls))
+
+            # NOTE. dna identity
+            boxlist.add_field("dna", per_identity)
+
             boxlist = boxlist.clip_to_image(remove_empty=False)
             boxlist = remove_small_boxes(boxlist, self.min_size)
             results.append(boxlist)
 
         return results
 
-    def forward(self, locations, box_cls, box_regression, centerness, image_sizes):
+    def forward(self, locations, box_cls, box_regression, centerness, identity, image_sizes):
         """
         Arguments:
             anchors: list[list[BoxList]]
@@ -124,20 +141,22 @@ class FCOSPostProcessor(torch.nn.Module):
                 applying box decoding and NMS
         """
         sampled_boxes = []
-        for _, (l, o, b, c) in enumerate(zip(locations, box_cls, box_regression, centerness)):
+        for _, (l, o, b, c, i) in enumerate(zip(locations, box_cls, box_regression, centerness, identity)):
             sampled_boxes.append(
                 self.forward_for_single_feature_map(
-                    l, o, b, c, image_sizes
+                    l, o, b, c, i, image_sizes
                 )
             )
 
         boxlists = list(zip(*sampled_boxes))
         boxlists = [cat_boxlist(boxlist) for boxlist in boxlists]
+
         if not self.bbox_aug_enabled:
             boxlists = self.select_over_all_levels(boxlists)
-
+       
         return boxlists
 
+    # NOTE add dna identity, delete nms here
     # TODO very similar to filter_results from PostProcessor
     # but filter_results is per image
     # TODO Yang: solve this issue in the future. No good solution
@@ -145,9 +164,14 @@ class FCOSPostProcessor(torch.nn.Module):
     def select_over_all_levels(self, boxlists):
         num_images = len(boxlists)
         results = []
+
         for i in range(num_images):
             # multiclass nms
-            result = boxlist_ml_nms(boxlists[i], self.nms_thresh)
+            if False:
+                result = boxlist_ml_nms(boxlists[i], self.nms_thresh)
+            else:
+                result = dna_nms(boxlists[i], self.nms_thresh)
+
             number_of_detections = len(result)
 
             # Limit to max_per_image detections **over all classes**

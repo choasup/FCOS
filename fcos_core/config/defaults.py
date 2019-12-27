@@ -342,6 +342,9 @@ _C.MODEL.DNA.CENTERNESS_ON_REG = False
 
 _C.MODEL.DNA.USE_DCN_IN_TOWER = False
 
+# hash code for dna
+_C.MODEL.DNA.HASH_CODE = 128
+
 # ---------------------------------------------------------------------------- #
 # RetinaNet Options (Follow the Detectron version)
 # ---------------------------------------------------------------------------- #

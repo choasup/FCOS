@@ -76,7 +76,7 @@ def do_train(
         meters.update(loss=losses_reduced, **loss_dict_reduced)
 
         # TODO check clip norm
-        if True:
+        if False:
             torch.nn.utils.clip_grad_norm_(model.parameters(), 10)
 
         optimizer.zero_grad()

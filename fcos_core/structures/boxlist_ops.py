@@ -58,6 +58,39 @@ def boxlist_ml_nms(boxlist, nms_thresh, max_proposals=-1,
     boxlist = boxlist[keep]
     return boxlist.convert(mode)
 
+def dna_nms(boxlist, nms_thresh, max_proposals=-1,
+            score_field="scores", label_field="labels", identity_field="dna"):
+    mode = boxlist.mode
+    boxlist = boxlist.convert("xyxy")
+    boxes = boxlist.bbox
+    scores = boxlist.get_field(score_field)
+    labels = boxlist.get_field(label_field)
+    identities = boxlist.get_field(identity_field)
+
+    identities_t = identities.permute(1, 0)
+    term1 = torch.norm(identities, 2, dim=1).unsqueeze(1)
+    term2 = torch.norm(identities_t, 2, dim=0).unsqueeze(0)
+
+    simillar = torch.matmul(identities, identities_t) / (term1 * term2)
+    idx, idy = torch.where(simillar > 0.5)
+
+    _, sorts = torch.sort(scores, descending=True)
+    
+    keep = []
+    nouse = set()
+    for index in sorts:
+        if int(index) in nouse:
+            continue
+        keep.append(int(index))
+        nouse = nouse.union(set(idy[torch.where(idx == index)].cpu().numpy().tolist()))
+         
+    if max_proposals > 0:
+        keep = keep[: max_proposals]
+    boxlist = boxlist[keep]
+
+    return boxlist.convert(mode)
+
+
 
 def remove_small_boxes(boxlist, min_size):
     """

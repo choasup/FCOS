@@ -53,6 +53,7 @@ class DNALossComputation(object):
         self.centerness_loss_func = nn.BCEWithLogitsLoss(reduction="sum")
 
         self.identity_loss_func = nn.BCELoss()
+        self.hash_code = cfg.MODEL.DNA.HASH_CODE
 
     def get_sample_region(self, gt, strides, num_points_per, gt_xs, gt_ys, radius=1.0):
         '''
@@ -325,7 +326,7 @@ class DNALossComputation(object):
         for batch_id in range(B):
             single_img = []
             for ids_level in identity:
-                per_img = ids_level[batch_id].reshape(128, -1) 
+                per_img = ids_level[batch_id].reshape(self.hash_code, -1) 
                 single_img.append(per_img) 
             single_img = torch.cat(single_img, -1)
 
@@ -337,10 +338,10 @@ class DNALossComputation(object):
             
             hash_match = (torch.sum(s1 * s2, 0) / (torch.norm(s1, 2, 0) * torch.norm(s2, 2, 0)))
             # TODO. need change loss
-            identity_losses.append(self.centerness_loss_func(hash_match, value) / value.shape[0])
+            identity_losses.append(self.centerness_loss_func(hash_match, value) / (value.shape[0]  + 1.0))
             
         identity_loss = sum(identity_losses) / B         
-       
+
         return cls_loss, reg_loss, centerness_loss, identity_loss
 
 

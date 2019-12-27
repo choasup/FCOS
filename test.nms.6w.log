@@ -1,0 +1,659 @@
+2019-12-27 03:17:29,556 fcos_core INFO: Using 8 GPUs
+2019-12-27 03:17:29,556 fcos_core INFO: DATALOADER:
+  ASPECT_RATIO_GROUPING: True
+  NUM_WORKERS: 4
+  SIZE_DIVISIBILITY: 32
+DATASETS:
+  TEST: ('coco_2014_minival',)
+  TRAIN: ('coco_2014_train', 'coco_2014_valminusminival')
+INPUT:
+  MAX_SIZE_TEST: 1333
+  MAX_SIZE_TRAIN: 1333
+  MIN_SIZE_RANGE_TRAIN: (-1, -1)
+  MIN_SIZE_TEST: 800
+  MIN_SIZE_TRAIN: (800,)
+  PIXEL_MEAN: [102.9801, 115.9465, 122.7717]
+  PIXEL_STD: [1.0, 1.0, 1.0]
+  TO_BGR255: True
+MODEL:
+  BACKBONE:
+    CONV_BODY: R-50-FPN-RETINANET
+    FREEZE_CONV_BODY_AT: 2
+    USE_GN: False
+  CLS_AGNOSTIC_BBOX_REG: False
+  DEVICE: cuda
+  DNA:
+    CENTERNESS_ON_REG: True
+    CENTER_SAMPLING_RADIUS: 1.5
+    FPN_STRIDES: [8, 16, 32, 64, 128]
+    HASH_CODE: 64
+    INFERENCE_TH: 0.05
+    IOU_LOSS_TYPE: giou
+    LOSS_ALPHA: 0.25
+    LOSS_GAMMA: 2.0
+    NMS_TH: 0.6
+    NORM_REG_TARGETS: True
+    NUM_CLASSES: 81
+    NUM_CONVS: 4
+    PRE_NMS_TOP_N: 1000
+    PRIOR_PROB: 0.01
+    USE_DCN_IN_TOWER: False
+  DNA_ON: True
+  FBNET:
+    ARCH: default
+    ARCH_DEF: 
+    BN_TYPE: bn
+    DET_HEAD_BLOCKS: []
+    DET_HEAD_LAST_SCALE: 1.0
+    DET_HEAD_STRIDE: 0
+    DW_CONV_SKIP_BN: True
+    DW_CONV_SKIP_RELU: True
+    KPTS_HEAD_BLOCKS: []
+    KPTS_HEAD_LAST_SCALE: 0.0
+    KPTS_HEAD_STRIDE: 0
+    MASK_HEAD_BLOCKS: []
+    MASK_HEAD_LAST_SCALE: 0.0
+    MASK_HEAD_STRIDE: 0
+    RPN_BN_TYPE: 
+    RPN_HEAD_BLOCKS: 0
+    SCALE_FACTOR: 1.0
+    WIDTH_DIVISOR: 1
+  FCOS:
+    CENTERNESS_ON_REG: False
+    CENTER_SAMPLING_RADIUS: 0.0
+    FPN_STRIDES: [8, 16, 32, 64, 128]
+    INFERENCE_TH: 0.05
+    IOU_LOSS_TYPE: iou
+    LOSS_ALPHA: 0.25
+    LOSS_GAMMA: 2.0
+    NMS_TH: 0.6
+    NORM_REG_TARGETS: False
+    NUM_CLASSES: 81
+    NUM_CONVS: 4
+    PRE_NMS_TOP_N: 1000
+    PRIOR_PROB: 0.01
+    USE_DCN_IN_TOWER: False
+  FCOS_ON: False
+  FPN:
+    USE_GN: False
+    USE_RELU: False
+  GROUP_NORM:
+    DIM_PER_GP: -1
+    EPSILON: 1e-05
+    NUM_GROUPS: 32
+  KEYPOINT_ON: False
+  MASK_ON: False
+  META_ARCHITECTURE: GeneralizedRCNN
+  RESNETS:
+    BACKBONE_OUT_CHANNELS: 256
+    DEFORMABLE_GROUPS: 1
+    NUM_GROUPS: 1
+    RES2_OUT_CHANNELS: 256
+    RES5_DILATION: 1
+    STAGE_WITH_DCN: (False, False, False, False)
+    STEM_FUNC: StemWithFixedBatchNorm
+    STEM_OUT_CHANNELS: 64
+    STRIDE_IN_1X1: True
+    TRANS_FUNC: BottleneckWithFixedBatchNorm
+    WIDTH_PER_GROUP: 64
+    WITH_MODULATED_DCN: False
+  RETINANET:
+    ANCHOR_SIZES: (32, 64, 128, 256, 512)
+    ANCHOR_STRIDES: (8, 16, 32, 64, 128)
+    ASPECT_RATIOS: (0.5, 1.0, 2.0)
+    BBOX_REG_BETA: 0.11
+    BBOX_REG_WEIGHT: 4.0
+    BG_IOU_THRESHOLD: 0.4
+    FG_IOU_THRESHOLD: 0.5
+    INFERENCE_TH: 0.05
+    LOSS_ALPHA: 0.25
+    LOSS_GAMMA: 2.0
+    NMS_TH: 0.4
+    NUM_CLASSES: 81
+    NUM_CONVS: 4
+    OCTAVE: 2.0
+    PRE_NMS_TOP_N: 1000
+    PRIOR_PROB: 0.01
+    SCALES_PER_OCTAVE: 3
+    STRADDLE_THRESH: 0
+    USE_C5: False
+  RETINANET_ON: False
+  ROI_BOX_HEAD:
+    CONV_HEAD_DIM: 256
+    DILATION: 1
+    FEATURE_EXTRACTOR: ResNet50Conv5ROIFeatureExtractor
+    MLP_HEAD_DIM: 1024
+    NUM_CLASSES: 81
+    NUM_STACKED_CONVS: 4
+    POOLER_RESOLUTION: 14
+    POOLER_SAMPLING_RATIO: 0
+    POOLER_SCALES: (0.0625,)
+    PREDICTOR: FastRCNNPredictor
+    USE_GN: False
+  ROI_HEADS:
+    BATCH_SIZE_PER_IMAGE: 512
+    BBOX_REG_WEIGHTS: (10.0, 10.0, 5.0, 5.0)
+    BG_IOU_THRESHOLD: 0.5
+    DETECTIONS_PER_IMG: 100
+    FG_IOU_THRESHOLD: 0.5
+    NMS: 0.5
+    POSITIVE_FRACTION: 0.25
+    SCORE_THRESH: 0.05
+    USE_FPN: False
+  ROI_KEYPOINT_HEAD:
+    CONV_LAYERS: (512, 512, 512, 512, 512, 512, 512, 512)
+    FEATURE_EXTRACTOR: KeypointRCNNFeatureExtractor
+    MLP_HEAD_DIM: 1024
+    NUM_CLASSES: 17
+    POOLER_RESOLUTION: 14
+    POOLER_SAMPLING_RATIO: 0
+    POOLER_SCALES: (0.0625,)
+    PREDICTOR: KeypointRCNNPredictor
+    RESOLUTION: 14
+    SHARE_BOX_FEATURE_EXTRACTOR: True
+  ROI_MASK_HEAD:
+    CONV_LAYERS: (256, 256, 256, 256)
+    DILATION: 1
+    FEATURE_EXTRACTOR: ResNet50Conv5ROIFeatureExtractor
+    MLP_HEAD_DIM: 1024
+    POOLER_RESOLUTION: 14
+    POOLER_SAMPLING_RATIO: 0
+    POOLER_SCALES: (0.0625,)
+    POSTPROCESS_MASKS: False
+    POSTPROCESS_MASKS_THRESHOLD: 0.5
+    PREDICTOR: MaskRCNNC4Predictor
+    RESOLUTION: 14
+    SHARE_BOX_FEATURE_EXTRACTOR: True
+    USE_GN: False
+  RPN:
+    ANCHOR_SIZES: (32, 64, 128, 256, 512)
+    ANCHOR_STRIDE: (16,)
+    ASPECT_RATIOS: (0.5, 1.0, 2.0)
+    BATCH_SIZE_PER_IMAGE: 256
+    BG_IOU_THRESHOLD: 0.3
+    FG_IOU_THRESHOLD: 0.7
+    FPN_POST_NMS_TOP_N_TEST: 2000
+    FPN_POST_NMS_TOP_N_TRAIN: 2000
+    MIN_SIZE: 0
+    NMS_THRESH: 0.7
+    POSITIVE_FRACTION: 0.5
+    POST_NMS_TOP_N_TEST: 1000
+    POST_NMS_TOP_N_TRAIN: 2000
+    PRE_NMS_TOP_N_TEST: 6000
+    PRE_NMS_TOP_N_TRAIN: 12000
+    RPN_HEAD: SingleConvRPNHead
+    STRADDLE_THRESH: 0
+    USE_FPN: False
+  RPN_ONLY: True
+  USE_SYNCBN: False
+  WEIGHT: ./training_dir/dna_imprv_R_50_FPN_1x/model_0060000.pth
+OUTPUT_DIR: .
+PATHS_CATALOG: /cephfs/person/choasliu/codes/FCOS/fcos_core/config/paths_catalog.py
+SOLVER:
+  BASE_LR: 0.01
+  BIAS_LR_FACTOR: 2
+  CHECKPOINT_PERIOD: 2500
+  DCONV_OFFSETS_LR_FACTOR: 1.0
+  GAMMA: 0.1
+  IMS_PER_BATCH: 16
+  MAX_ITER: 90000
+  MOMENTUM: 0.9
+  STEPS: (60000, 80000)
+  WARMUP_FACTOR: 0.3333333333333333
+  WARMUP_ITERS: 500
+  WARMUP_METHOD: constant
+  WEIGHT_DECAY: 0.0001
+  WEIGHT_DECAY_BIAS: 0
+TEST:
+  BBOX_AUG:
+    ENABLED: False
+    H_FLIP: False
+    MAX_SIZE: 4000
+    SCALES: ()
+    SCALE_H_FLIP: False
+  DETECTIONS_PER_IMG: 100
+  EXPECTED_RESULTS: []
+  EXPECTED_RESULTS_SIGMA_TOL: 4
+  IMS_PER_BATCH: 8
+2019-12-27 03:17:29,557 fcos_core INFO: Collecting env info (might take some time)
+2019-12-27 03:17:33,133 fcos_core INFO: 
+PyTorch version: 1.3.0
+Is debug build: No
+CUDA used to build PyTorch: 10.1.243
+
+OS: Ubuntu 18.04.3 LTS
+GCC version: (Ubuntu 7.4.0-1ubuntu1~18.04.1) 7.4.0
+CMake version: Could not collect
+
+Python version: 3.6
+Is CUDA available: Yes
+CUDA runtime version: 10.1.243
+GPU models and configuration: 
+GPU 0: Tesla P40
+GPU 1: Tesla P40
+GPU 2: Tesla P40
+GPU 3: Tesla P40
+GPU 4: Tesla P40
+GPU 5: Tesla P40
+GPU 6: Tesla P40
+GPU 7: Tesla P40
+
+Nvidia driver version: 384.130
+cuDNN version: /usr/lib/x86_64-linux-gnu/libcudnn.so.7.6.3
+
+Versions of relevant libraries:
+[pip3] numpy==1.13.3
+[pip3] torch==1.3.0
+[pip3] torchvision==0.4.1
+[conda] Could not collect
+        Pillow (6.2.0)
+2019-12-27 03:17:33,853 fcos_core.utils.checkpoint INFO: Loading checkpoint from ./training_dir/dna_imprv_R_50_FPN_1x/model_0060000.pth
+2019-12-27 03:17:34,102 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn1.bias                  loaded from backbone.body.layer1.0.bn1.bias                  of shape (64,)
+2019-12-27 03:17:34,103 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn1.running_mean          loaded from backbone.body.layer1.0.bn1.running_mean          of shape (64,)
+2019-12-27 03:17:34,103 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn1.running_var           loaded from backbone.body.layer1.0.bn1.running_var           of shape (64,)
+2019-12-27 03:17:34,103 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn1.weight                loaded from backbone.body.layer1.0.bn1.weight                of shape (64,)
+2019-12-27 03:17:34,103 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn2.bias                  loaded from backbone.body.layer1.0.bn2.bias                  of shape (64,)
+2019-12-27 03:17:34,103 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn2.running_mean          loaded from backbone.body.layer1.0.bn2.running_mean          of shape (64,)
+2019-12-27 03:17:34,103 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn2.running_var           loaded from backbone.body.layer1.0.bn2.running_var           of shape (64,)
+2019-12-27 03:17:34,103 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn2.weight                loaded from backbone.body.layer1.0.bn2.weight                of shape (64,)
+2019-12-27 03:17:34,103 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn3.bias                  loaded from backbone.body.layer1.0.bn3.bias                  of shape (256,)
+2019-12-27 03:17:34,103 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn3.running_mean          loaded from backbone.body.layer1.0.bn3.running_mean          of shape (256,)
+2019-12-27 03:17:34,104 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn3.running_var           loaded from backbone.body.layer1.0.bn3.running_var           of shape (256,)
+2019-12-27 03:17:34,104 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.bn3.weight                loaded from backbone.body.layer1.0.bn3.weight                of shape (256,)
+2019-12-27 03:17:34,104 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.conv1.weight              loaded from backbone.body.layer1.0.conv1.weight              of shape (64, 64, 1, 1)
+2019-12-27 03:17:34,104 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.conv2.weight              loaded from backbone.body.layer1.0.conv2.weight              of shape (64, 64, 3, 3)
+2019-12-27 03:17:34,104 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.conv3.weight              loaded from backbone.body.layer1.0.conv3.weight              of shape (256, 64, 1, 1)
+2019-12-27 03:17:34,104 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.downsample.0.weight       loaded from backbone.body.layer1.0.downsample.0.weight       of shape (256, 64, 1, 1)
+2019-12-27 03:17:34,104 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.downsample.1.bias         loaded from backbone.body.layer1.0.downsample.1.bias         of shape (256,)
+2019-12-27 03:17:34,104 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.downsample.1.running_mean loaded from backbone.body.layer1.0.downsample.1.running_mean of shape (256,)
+2019-12-27 03:17:34,104 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.downsample.1.running_var  loaded from backbone.body.layer1.0.downsample.1.running_var  of shape (256,)
+2019-12-27 03:17:34,104 fcos_core.utils.model_serialization INFO: backbone.body.layer1.0.downsample.1.weight       loaded from backbone.body.layer1.0.downsample.1.weight       of shape (256,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn1.bias                  loaded from backbone.body.layer1.1.bn1.bias                  of shape (64,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn1.running_mean          loaded from backbone.body.layer1.1.bn1.running_mean          of shape (64,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn1.running_var           loaded from backbone.body.layer1.1.bn1.running_var           of shape (64,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn1.weight                loaded from backbone.body.layer1.1.bn1.weight                of shape (64,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn2.bias                  loaded from backbone.body.layer1.1.bn2.bias                  of shape (64,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn2.running_mean          loaded from backbone.body.layer1.1.bn2.running_mean          of shape (64,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn2.running_var           loaded from backbone.body.layer1.1.bn2.running_var           of shape (64,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn2.weight                loaded from backbone.body.layer1.1.bn2.weight                of shape (64,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn3.bias                  loaded from backbone.body.layer1.1.bn3.bias                  of shape (256,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn3.running_mean          loaded from backbone.body.layer1.1.bn3.running_mean          of shape (256,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn3.running_var           loaded from backbone.body.layer1.1.bn3.running_var           of shape (256,)
+2019-12-27 03:17:34,105 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.bn3.weight                loaded from backbone.body.layer1.1.bn3.weight                of shape (256,)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.conv1.weight              loaded from backbone.body.layer1.1.conv1.weight              of shape (64, 256, 1, 1)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.conv2.weight              loaded from backbone.body.layer1.1.conv2.weight              of shape (64, 64, 3, 3)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.1.conv3.weight              loaded from backbone.body.layer1.1.conv3.weight              of shape (256, 64, 1, 1)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn1.bias                  loaded from backbone.body.layer1.2.bn1.bias                  of shape (64,)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn1.running_mean          loaded from backbone.body.layer1.2.bn1.running_mean          of shape (64,)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn1.running_var           loaded from backbone.body.layer1.2.bn1.running_var           of shape (64,)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn1.weight                loaded from backbone.body.layer1.2.bn1.weight                of shape (64,)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn2.bias                  loaded from backbone.body.layer1.2.bn2.bias                  of shape (64,)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn2.running_mean          loaded from backbone.body.layer1.2.bn2.running_mean          of shape (64,)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn2.running_var           loaded from backbone.body.layer1.2.bn2.running_var           of shape (64,)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn2.weight                loaded from backbone.body.layer1.2.bn2.weight                of shape (64,)
+2019-12-27 03:17:34,106 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn3.bias                  loaded from backbone.body.layer1.2.bn3.bias                  of shape (256,)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn3.running_mean          loaded from backbone.body.layer1.2.bn3.running_mean          of shape (256,)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn3.running_var           loaded from backbone.body.layer1.2.bn3.running_var           of shape (256,)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.bn3.weight                loaded from backbone.body.layer1.2.bn3.weight                of shape (256,)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.conv1.weight              loaded from backbone.body.layer1.2.conv1.weight              of shape (64, 256, 1, 1)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.conv2.weight              loaded from backbone.body.layer1.2.conv2.weight              of shape (64, 64, 3, 3)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer1.2.conv3.weight              loaded from backbone.body.layer1.2.conv3.weight              of shape (256, 64, 1, 1)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn1.bias                  loaded from backbone.body.layer2.0.bn1.bias                  of shape (128,)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn1.running_mean          loaded from backbone.body.layer2.0.bn1.running_mean          of shape (128,)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn1.running_var           loaded from backbone.body.layer2.0.bn1.running_var           of shape (128,)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn1.weight                loaded from backbone.body.layer2.0.bn1.weight                of shape (128,)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn2.bias                  loaded from backbone.body.layer2.0.bn2.bias                  of shape (128,)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn2.running_mean          loaded from backbone.body.layer2.0.bn2.running_mean          of shape (128,)
+2019-12-27 03:17:34,107 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn2.running_var           loaded from backbone.body.layer2.0.bn2.running_var           of shape (128,)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn2.weight                loaded from backbone.body.layer2.0.bn2.weight                of shape (128,)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn3.bias                  loaded from backbone.body.layer2.0.bn3.bias                  of shape (512,)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn3.running_mean          loaded from backbone.body.layer2.0.bn3.running_mean          of shape (512,)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn3.running_var           loaded from backbone.body.layer2.0.bn3.running_var           of shape (512,)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.bn3.weight                loaded from backbone.body.layer2.0.bn3.weight                of shape (512,)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.conv1.weight              loaded from backbone.body.layer2.0.conv1.weight              of shape (128, 256, 1, 1)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.conv2.weight              loaded from backbone.body.layer2.0.conv2.weight              of shape (128, 128, 3, 3)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.conv3.weight              loaded from backbone.body.layer2.0.conv3.weight              of shape (512, 128, 1, 1)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.downsample.0.weight       loaded from backbone.body.layer2.0.downsample.0.weight       of shape (512, 256, 1, 1)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.downsample.1.bias         loaded from backbone.body.layer2.0.downsample.1.bias         of shape (512,)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.downsample.1.running_mean loaded from backbone.body.layer2.0.downsample.1.running_mean of shape (512,)
+2019-12-27 03:17:34,108 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.downsample.1.running_var  loaded from backbone.body.layer2.0.downsample.1.running_var  of shape (512,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.0.downsample.1.weight       loaded from backbone.body.layer2.0.downsample.1.weight       of shape (512,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn1.bias                  loaded from backbone.body.layer2.1.bn1.bias                  of shape (128,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn1.running_mean          loaded from backbone.body.layer2.1.bn1.running_mean          of shape (128,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn1.running_var           loaded from backbone.body.layer2.1.bn1.running_var           of shape (128,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn1.weight                loaded from backbone.body.layer2.1.bn1.weight                of shape (128,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn2.bias                  loaded from backbone.body.layer2.1.bn2.bias                  of shape (128,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn2.running_mean          loaded from backbone.body.layer2.1.bn2.running_mean          of shape (128,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn2.running_var           loaded from backbone.body.layer2.1.bn2.running_var           of shape (128,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn2.weight                loaded from backbone.body.layer2.1.bn2.weight                of shape (128,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn3.bias                  loaded from backbone.body.layer2.1.bn3.bias                  of shape (512,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn3.running_mean          loaded from backbone.body.layer2.1.bn3.running_mean          of shape (512,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn3.running_var           loaded from backbone.body.layer2.1.bn3.running_var           of shape (512,)
+2019-12-27 03:17:34,109 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.bn3.weight                loaded from backbone.body.layer2.1.bn3.weight                of shape (512,)
+2019-12-27 03:17:34,110 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.conv1.weight              loaded from backbone.body.layer2.1.conv1.weight              of shape (128, 512, 1, 1)
+2019-12-27 03:17:34,110 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.conv2.weight              loaded from backbone.body.layer2.1.conv2.weight              of shape (128, 128, 3, 3)
+2019-12-27 03:17:34,110 fcos_core.utils.model_serialization INFO: backbone.body.layer2.1.conv3.weight              loaded from backbone.body.layer2.1.conv3.weight              of shape (512, 128, 1, 1)
+2019-12-27 03:17:34,110 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn1.bias                  loaded from backbone.body.layer2.2.bn1.bias                  of shape (128,)
+2019-12-27 03:17:34,110 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn1.running_mean          loaded from backbone.body.layer2.2.bn1.running_mean          of shape (128,)
+2019-12-27 03:17:34,110 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn1.running_var           loaded from backbone.body.layer2.2.bn1.running_var           of shape (128,)
+2019-12-27 03:17:34,110 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn1.weight                loaded from backbone.body.layer2.2.bn1.weight                of shape (128,)
+2019-12-27 03:17:34,110 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn2.bias                  loaded from backbone.body.layer2.2.bn2.bias                  of shape (128,)
+2019-12-27 03:17:34,111 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn2.running_mean          loaded from backbone.body.layer2.2.bn2.running_mean          of shape (128,)
+2019-12-27 03:17:34,111 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn2.running_var           loaded from backbone.body.layer2.2.bn2.running_var           of shape (128,)
+2019-12-27 03:17:34,111 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn2.weight                loaded from backbone.body.layer2.2.bn2.weight                of shape (128,)
+2019-12-27 03:17:34,111 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn3.bias                  loaded from backbone.body.layer2.2.bn3.bias                  of shape (512,)
+2019-12-27 03:17:34,111 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn3.running_mean          loaded from backbone.body.layer2.2.bn3.running_mean          of shape (512,)
+2019-12-27 03:17:34,111 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn3.running_var           loaded from backbone.body.layer2.2.bn3.running_var           of shape (512,)
+2019-12-27 03:17:34,111 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.bn3.weight                loaded from backbone.body.layer2.2.bn3.weight                of shape (512,)
+2019-12-27 03:17:34,111 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.conv1.weight              loaded from backbone.body.layer2.2.conv1.weight              of shape (128, 512, 1, 1)
+2019-12-27 03:17:34,111 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.conv2.weight              loaded from backbone.body.layer2.2.conv2.weight              of shape (128, 128, 3, 3)
+2019-12-27 03:17:34,111 fcos_core.utils.model_serialization INFO: backbone.body.layer2.2.conv3.weight              loaded from backbone.body.layer2.2.conv3.weight              of shape (512, 128, 1, 1)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn1.bias                  loaded from backbone.body.layer2.3.bn1.bias                  of shape (128,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn1.running_mean          loaded from backbone.body.layer2.3.bn1.running_mean          of shape (128,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn1.running_var           loaded from backbone.body.layer2.3.bn1.running_var           of shape (128,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn1.weight                loaded from backbone.body.layer2.3.bn1.weight                of shape (128,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn2.bias                  loaded from backbone.body.layer2.3.bn2.bias                  of shape (128,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn2.running_mean          loaded from backbone.body.layer2.3.bn2.running_mean          of shape (128,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn2.running_var           loaded from backbone.body.layer2.3.bn2.running_var           of shape (128,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn2.weight                loaded from backbone.body.layer2.3.bn2.weight                of shape (128,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn3.bias                  loaded from backbone.body.layer2.3.bn3.bias                  of shape (512,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn3.running_mean          loaded from backbone.body.layer2.3.bn3.running_mean          of shape (512,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn3.running_var           loaded from backbone.body.layer2.3.bn3.running_var           of shape (512,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.bn3.weight                loaded from backbone.body.layer2.3.bn3.weight                of shape (512,)
+2019-12-27 03:17:34,112 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.conv1.weight              loaded from backbone.body.layer2.3.conv1.weight              of shape (128, 512, 1, 1)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.conv2.weight              loaded from backbone.body.layer2.3.conv2.weight              of shape (128, 128, 3, 3)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer2.3.conv3.weight              loaded from backbone.body.layer2.3.conv3.weight              of shape (512, 128, 1, 1)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn1.bias                  loaded from backbone.body.layer3.0.bn1.bias                  of shape (256,)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn1.running_mean          loaded from backbone.body.layer3.0.bn1.running_mean          of shape (256,)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn1.running_var           loaded from backbone.body.layer3.0.bn1.running_var           of shape (256,)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn1.weight                loaded from backbone.body.layer3.0.bn1.weight                of shape (256,)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn2.bias                  loaded from backbone.body.layer3.0.bn2.bias                  of shape (256,)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn2.running_mean          loaded from backbone.body.layer3.0.bn2.running_mean          of shape (256,)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn2.running_var           loaded from backbone.body.layer3.0.bn2.running_var           of shape (256,)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn2.weight                loaded from backbone.body.layer3.0.bn2.weight                of shape (256,)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn3.bias                  loaded from backbone.body.layer3.0.bn3.bias                  of shape (1024,)
+2019-12-27 03:17:34,113 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn3.running_mean          loaded from backbone.body.layer3.0.bn3.running_mean          of shape (1024,)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn3.running_var           loaded from backbone.body.layer3.0.bn3.running_var           of shape (1024,)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.bn3.weight                loaded from backbone.body.layer3.0.bn3.weight                of shape (1024,)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.conv1.weight              loaded from backbone.body.layer3.0.conv1.weight              of shape (256, 512, 1, 1)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.conv2.weight              loaded from backbone.body.layer3.0.conv2.weight              of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.conv3.weight              loaded from backbone.body.layer3.0.conv3.weight              of shape (1024, 256, 1, 1)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.downsample.0.weight       loaded from backbone.body.layer3.0.downsample.0.weight       of shape (1024, 512, 1, 1)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.downsample.1.bias         loaded from backbone.body.layer3.0.downsample.1.bias         of shape (1024,)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.downsample.1.running_mean loaded from backbone.body.layer3.0.downsample.1.running_mean of shape (1024,)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.downsample.1.running_var  loaded from backbone.body.layer3.0.downsample.1.running_var  of shape (1024,)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.0.downsample.1.weight       loaded from backbone.body.layer3.0.downsample.1.weight       of shape (1024,)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn1.bias                  loaded from backbone.body.layer3.1.bn1.bias                  of shape (256,)
+2019-12-27 03:17:34,114 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn1.running_mean          loaded from backbone.body.layer3.1.bn1.running_mean          of shape (256,)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn1.running_var           loaded from backbone.body.layer3.1.bn1.running_var           of shape (256,)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn1.weight                loaded from backbone.body.layer3.1.bn1.weight                of shape (256,)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn2.bias                  loaded from backbone.body.layer3.1.bn2.bias                  of shape (256,)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn2.running_mean          loaded from backbone.body.layer3.1.bn2.running_mean          of shape (256,)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn2.running_var           loaded from backbone.body.layer3.1.bn2.running_var           of shape (256,)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn2.weight                loaded from backbone.body.layer3.1.bn2.weight                of shape (256,)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn3.bias                  loaded from backbone.body.layer3.1.bn3.bias                  of shape (1024,)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn3.running_mean          loaded from backbone.body.layer3.1.bn3.running_mean          of shape (1024,)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn3.running_var           loaded from backbone.body.layer3.1.bn3.running_var           of shape (1024,)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.bn3.weight                loaded from backbone.body.layer3.1.bn3.weight                of shape (1024,)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.conv1.weight              loaded from backbone.body.layer3.1.conv1.weight              of shape (256, 1024, 1, 1)
+2019-12-27 03:17:34,115 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.conv2.weight              loaded from backbone.body.layer3.1.conv2.weight              of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.1.conv3.weight              loaded from backbone.body.layer3.1.conv3.weight              of shape (1024, 256, 1, 1)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn1.bias                  loaded from backbone.body.layer3.2.bn1.bias                  of shape (256,)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn1.running_mean          loaded from backbone.body.layer3.2.bn1.running_mean          of shape (256,)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn1.running_var           loaded from backbone.body.layer3.2.bn1.running_var           of shape (256,)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn1.weight                loaded from backbone.body.layer3.2.bn1.weight                of shape (256,)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn2.bias                  loaded from backbone.body.layer3.2.bn2.bias                  of shape (256,)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn2.running_mean          loaded from backbone.body.layer3.2.bn2.running_mean          of shape (256,)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn2.running_var           loaded from backbone.body.layer3.2.bn2.running_var           of shape (256,)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn2.weight                loaded from backbone.body.layer3.2.bn2.weight                of shape (256,)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn3.bias                  loaded from backbone.body.layer3.2.bn3.bias                  of shape (1024,)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn3.running_mean          loaded from backbone.body.layer3.2.bn3.running_mean          of shape (1024,)
+2019-12-27 03:17:34,116 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn3.running_var           loaded from backbone.body.layer3.2.bn3.running_var           of shape (1024,)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.bn3.weight                loaded from backbone.body.layer3.2.bn3.weight                of shape (1024,)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.conv1.weight              loaded from backbone.body.layer3.2.conv1.weight              of shape (256, 1024, 1, 1)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.conv2.weight              loaded from backbone.body.layer3.2.conv2.weight              of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.2.conv3.weight              loaded from backbone.body.layer3.2.conv3.weight              of shape (1024, 256, 1, 1)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn1.bias                  loaded from backbone.body.layer3.3.bn1.bias                  of shape (256,)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn1.running_mean          loaded from backbone.body.layer3.3.bn1.running_mean          of shape (256,)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn1.running_var           loaded from backbone.body.layer3.3.bn1.running_var           of shape (256,)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn1.weight                loaded from backbone.body.layer3.3.bn1.weight                of shape (256,)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn2.bias                  loaded from backbone.body.layer3.3.bn2.bias                  of shape (256,)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn2.running_mean          loaded from backbone.body.layer3.3.bn2.running_mean          of shape (256,)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn2.running_var           loaded from backbone.body.layer3.3.bn2.running_var           of shape (256,)
+2019-12-27 03:17:34,117 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn2.weight                loaded from backbone.body.layer3.3.bn2.weight                of shape (256,)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn3.bias                  loaded from backbone.body.layer3.3.bn3.bias                  of shape (1024,)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn3.running_mean          loaded from backbone.body.layer3.3.bn3.running_mean          of shape (1024,)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn3.running_var           loaded from backbone.body.layer3.3.bn3.running_var           of shape (1024,)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.bn3.weight                loaded from backbone.body.layer3.3.bn3.weight                of shape (1024,)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.conv1.weight              loaded from backbone.body.layer3.3.conv1.weight              of shape (256, 1024, 1, 1)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.conv2.weight              loaded from backbone.body.layer3.3.conv2.weight              of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.3.conv3.weight              loaded from backbone.body.layer3.3.conv3.weight              of shape (1024, 256, 1, 1)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn1.bias                  loaded from backbone.body.layer3.4.bn1.bias                  of shape (256,)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn1.running_mean          loaded from backbone.body.layer3.4.bn1.running_mean          of shape (256,)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn1.running_var           loaded from backbone.body.layer3.4.bn1.running_var           of shape (256,)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn1.weight                loaded from backbone.body.layer3.4.bn1.weight                of shape (256,)
+2019-12-27 03:17:34,118 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn2.bias                  loaded from backbone.body.layer3.4.bn2.bias                  of shape (256,)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn2.running_mean          loaded from backbone.body.layer3.4.bn2.running_mean          of shape (256,)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn2.running_var           loaded from backbone.body.layer3.4.bn2.running_var           of shape (256,)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn2.weight                loaded from backbone.body.layer3.4.bn2.weight                of shape (256,)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn3.bias                  loaded from backbone.body.layer3.4.bn3.bias                  of shape (1024,)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn3.running_mean          loaded from backbone.body.layer3.4.bn3.running_mean          of shape (1024,)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn3.running_var           loaded from backbone.body.layer3.4.bn3.running_var           of shape (1024,)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.bn3.weight                loaded from backbone.body.layer3.4.bn3.weight                of shape (1024,)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.conv1.weight              loaded from backbone.body.layer3.4.conv1.weight              of shape (256, 1024, 1, 1)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.conv2.weight              loaded from backbone.body.layer3.4.conv2.weight              of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.4.conv3.weight              loaded from backbone.body.layer3.4.conv3.weight              of shape (1024, 256, 1, 1)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn1.bias                  loaded from backbone.body.layer3.5.bn1.bias                  of shape (256,)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn1.running_mean          loaded from backbone.body.layer3.5.bn1.running_mean          of shape (256,)
+2019-12-27 03:17:34,119 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn1.running_var           loaded from backbone.body.layer3.5.bn1.running_var           of shape (256,)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn1.weight                loaded from backbone.body.layer3.5.bn1.weight                of shape (256,)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn2.bias                  loaded from backbone.body.layer3.5.bn2.bias                  of shape (256,)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn2.running_mean          loaded from backbone.body.layer3.5.bn2.running_mean          of shape (256,)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn2.running_var           loaded from backbone.body.layer3.5.bn2.running_var           of shape (256,)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn2.weight                loaded from backbone.body.layer3.5.bn2.weight                of shape (256,)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn3.bias                  loaded from backbone.body.layer3.5.bn3.bias                  of shape (1024,)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn3.running_mean          loaded from backbone.body.layer3.5.bn3.running_mean          of shape (1024,)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn3.running_var           loaded from backbone.body.layer3.5.bn3.running_var           of shape (1024,)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.bn3.weight                loaded from backbone.body.layer3.5.bn3.weight                of shape (1024,)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.conv1.weight              loaded from backbone.body.layer3.5.conv1.weight              of shape (256, 1024, 1, 1)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.conv2.weight              loaded from backbone.body.layer3.5.conv2.weight              of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,120 fcos_core.utils.model_serialization INFO: backbone.body.layer3.5.conv3.weight              loaded from backbone.body.layer3.5.conv3.weight              of shape (1024, 256, 1, 1)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn1.bias                  loaded from backbone.body.layer4.0.bn1.bias                  of shape (512,)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn1.running_mean          loaded from backbone.body.layer4.0.bn1.running_mean          of shape (512,)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn1.running_var           loaded from backbone.body.layer4.0.bn1.running_var           of shape (512,)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn1.weight                loaded from backbone.body.layer4.0.bn1.weight                of shape (512,)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn2.bias                  loaded from backbone.body.layer4.0.bn2.bias                  of shape (512,)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn2.running_mean          loaded from backbone.body.layer4.0.bn2.running_mean          of shape (512,)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn2.running_var           loaded from backbone.body.layer4.0.bn2.running_var           of shape (512,)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn2.weight                loaded from backbone.body.layer4.0.bn2.weight                of shape (512,)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn3.bias                  loaded from backbone.body.layer4.0.bn3.bias                  of shape (2048,)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn3.running_mean          loaded from backbone.body.layer4.0.bn3.running_mean          of shape (2048,)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn3.running_var           loaded from backbone.body.layer4.0.bn3.running_var           of shape (2048,)
+2019-12-27 03:17:34,121 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.bn3.weight                loaded from backbone.body.layer4.0.bn3.weight                of shape (2048,)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.conv1.weight              loaded from backbone.body.layer4.0.conv1.weight              of shape (512, 1024, 1, 1)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.conv2.weight              loaded from backbone.body.layer4.0.conv2.weight              of shape (512, 512, 3, 3)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.conv3.weight              loaded from backbone.body.layer4.0.conv3.weight              of shape (2048, 512, 1, 1)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.downsample.0.weight       loaded from backbone.body.layer4.0.downsample.0.weight       of shape (2048, 1024, 1, 1)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.downsample.1.bias         loaded from backbone.body.layer4.0.downsample.1.bias         of shape (2048,)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.downsample.1.running_mean loaded from backbone.body.layer4.0.downsample.1.running_mean of shape (2048,)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.downsample.1.running_var  loaded from backbone.body.layer4.0.downsample.1.running_var  of shape (2048,)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.0.downsample.1.weight       loaded from backbone.body.layer4.0.downsample.1.weight       of shape (2048,)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn1.bias                  loaded from backbone.body.layer4.1.bn1.bias                  of shape (512,)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn1.running_mean          loaded from backbone.body.layer4.1.bn1.running_mean          of shape (512,)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn1.running_var           loaded from backbone.body.layer4.1.bn1.running_var           of shape (512,)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn1.weight                loaded from backbone.body.layer4.1.bn1.weight                of shape (512,)
+2019-12-27 03:17:34,122 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn2.bias                  loaded from backbone.body.layer4.1.bn2.bias                  of shape (512,)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn2.running_mean          loaded from backbone.body.layer4.1.bn2.running_mean          of shape (512,)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn2.running_var           loaded from backbone.body.layer4.1.bn2.running_var           of shape (512,)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn2.weight                loaded from backbone.body.layer4.1.bn2.weight                of shape (512,)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn3.bias                  loaded from backbone.body.layer4.1.bn3.bias                  of shape (2048,)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn3.running_mean          loaded from backbone.body.layer4.1.bn3.running_mean          of shape (2048,)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn3.running_var           loaded from backbone.body.layer4.1.bn3.running_var           of shape (2048,)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.bn3.weight                loaded from backbone.body.layer4.1.bn3.weight                of shape (2048,)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.conv1.weight              loaded from backbone.body.layer4.1.conv1.weight              of shape (512, 2048, 1, 1)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.conv2.weight              loaded from backbone.body.layer4.1.conv2.weight              of shape (512, 512, 3, 3)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.1.conv3.weight              loaded from backbone.body.layer4.1.conv3.weight              of shape (2048, 512, 1, 1)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn1.bias                  loaded from backbone.body.layer4.2.bn1.bias                  of shape (512,)
+2019-12-27 03:17:34,123 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn1.running_mean          loaded from backbone.body.layer4.2.bn1.running_mean          of shape (512,)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn1.running_var           loaded from backbone.body.layer4.2.bn1.running_var           of shape (512,)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn1.weight                loaded from backbone.body.layer4.2.bn1.weight                of shape (512,)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn2.bias                  loaded from backbone.body.layer4.2.bn2.bias                  of shape (512,)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn2.running_mean          loaded from backbone.body.layer4.2.bn2.running_mean          of shape (512,)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn2.running_var           loaded from backbone.body.layer4.2.bn2.running_var           of shape (512,)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn2.weight                loaded from backbone.body.layer4.2.bn2.weight                of shape (512,)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn3.bias                  loaded from backbone.body.layer4.2.bn3.bias                  of shape (2048,)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn3.running_mean          loaded from backbone.body.layer4.2.bn3.running_mean          of shape (2048,)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn3.running_var           loaded from backbone.body.layer4.2.bn3.running_var           of shape (2048,)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.bn3.weight                loaded from backbone.body.layer4.2.bn3.weight                of shape (2048,)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.conv1.weight              loaded from backbone.body.layer4.2.conv1.weight              of shape (512, 2048, 1, 1)
+2019-12-27 03:17:34,124 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.conv2.weight              loaded from backbone.body.layer4.2.conv2.weight              of shape (512, 512, 3, 3)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.body.layer4.2.conv3.weight              loaded from backbone.body.layer4.2.conv3.weight              of shape (2048, 512, 1, 1)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.body.stem.bn1.bias                      loaded from backbone.body.stem.bn1.bias                      of shape (64,)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.body.stem.bn1.running_mean              loaded from backbone.body.stem.bn1.running_mean              of shape (64,)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.body.stem.bn1.running_var               loaded from backbone.body.stem.bn1.running_var               of shape (64,)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.body.stem.bn1.weight                    loaded from backbone.body.stem.bn1.weight                    of shape (64,)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.body.stem.conv1.weight                  loaded from backbone.body.stem.conv1.weight                  of shape (64, 3, 7, 7)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_inner2.bias                     loaded from backbone.fpn.fpn_inner2.bias                     of shape (256,)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_inner2.weight                   loaded from backbone.fpn.fpn_inner2.weight                   of shape (256, 512, 1, 1)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_inner3.bias                     loaded from backbone.fpn.fpn_inner3.bias                     of shape (256,)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_inner3.weight                   loaded from backbone.fpn.fpn_inner3.weight                   of shape (256, 1024, 1, 1)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_inner4.bias                     loaded from backbone.fpn.fpn_inner4.bias                     of shape (256,)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_inner4.weight                   loaded from backbone.fpn.fpn_inner4.weight                   of shape (256, 2048, 1, 1)
+2019-12-27 03:17:34,125 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_layer2.bias                     loaded from backbone.fpn.fpn_layer2.bias                     of shape (256,)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_layer2.weight                   loaded from backbone.fpn.fpn_layer2.weight                   of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_layer3.bias                     loaded from backbone.fpn.fpn_layer3.bias                     of shape (256,)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_layer3.weight                   loaded from backbone.fpn.fpn_layer3.weight                   of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_layer4.bias                     loaded from backbone.fpn.fpn_layer4.bias                     of shape (256,)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: backbone.fpn.fpn_layer4.weight                   loaded from backbone.fpn.fpn_layer4.weight                   of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: backbone.fpn.top_blocks.p6.bias                  loaded from backbone.fpn.top_blocks.p6.bias                  of shape (256,)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: backbone.fpn.top_blocks.p6.weight                loaded from backbone.fpn.top_blocks.p6.weight                of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: backbone.fpn.top_blocks.p7.bias                  loaded from backbone.fpn.top_blocks.p7.bias                  of shape (256,)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: backbone.fpn.top_blocks.p7.weight                loaded from backbone.fpn.top_blocks.p7.weight                of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: rpn.head.bbox_pred.bias                          loaded from rpn.head.bbox_pred.bias                          of shape (4,)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: rpn.head.bbox_pred.weight                        loaded from rpn.head.bbox_pred.weight                        of shape (4, 256, 3, 3)
+2019-12-27 03:17:34,126 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.0.bias                       loaded from rpn.head.bbox_tower.0.bias                       of shape (256,)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.0.weight                     loaded from rpn.head.bbox_tower.0.weight                     of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.1.bias                       loaded from rpn.head.bbox_tower.1.bias                       of shape (256,)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.1.weight                     loaded from rpn.head.bbox_tower.1.weight                     of shape (256,)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.10.bias                      loaded from rpn.head.bbox_tower.10.bias                      of shape (256,)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.10.weight                    loaded from rpn.head.bbox_tower.10.weight                    of shape (256,)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.3.bias                       loaded from rpn.head.bbox_tower.3.bias                       of shape (256,)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.3.weight                     loaded from rpn.head.bbox_tower.3.weight                     of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.4.bias                       loaded from rpn.head.bbox_tower.4.bias                       of shape (256,)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.4.weight                     loaded from rpn.head.bbox_tower.4.weight                     of shape (256,)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.6.bias                       loaded from rpn.head.bbox_tower.6.bias                       of shape (256,)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.6.weight                     loaded from rpn.head.bbox_tower.6.weight                     of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,127 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.7.bias                       loaded from rpn.head.bbox_tower.7.bias                       of shape (256,)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.7.weight                     loaded from rpn.head.bbox_tower.7.weight                     of shape (256,)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.9.bias                       loaded from rpn.head.bbox_tower.9.bias                       of shape (256,)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.bbox_tower.9.weight                     loaded from rpn.head.bbox_tower.9.weight                     of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.centerness.bias                         loaded from rpn.head.centerness.bias                         of shape (1,)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.centerness.weight                       loaded from rpn.head.centerness.weight                       of shape (1, 256, 3, 3)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.cls_logits.bias                         loaded from rpn.head.cls_logits.bias                         of shape (80,)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.cls_logits.weight                       loaded from rpn.head.cls_logits.weight                       of shape (80, 256, 3, 3)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.0.bias                        loaded from rpn.head.cls_tower.0.bias                        of shape (256,)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.0.weight                      loaded from rpn.head.cls_tower.0.weight                      of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.1.bias                        loaded from rpn.head.cls_tower.1.bias                        of shape (256,)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.1.weight                      loaded from rpn.head.cls_tower.1.weight                      of shape (256,)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.10.bias                       loaded from rpn.head.cls_tower.10.bias                       of shape (256,)
+2019-12-27 03:17:34,128 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.10.weight                     loaded from rpn.head.cls_tower.10.weight                     of shape (256,)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.3.bias                        loaded from rpn.head.cls_tower.3.bias                        of shape (256,)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.3.weight                      loaded from rpn.head.cls_tower.3.weight                      of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.4.bias                        loaded from rpn.head.cls_tower.4.bias                        of shape (256,)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.4.weight                      loaded from rpn.head.cls_tower.4.weight                      of shape (256,)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.6.bias                        loaded from rpn.head.cls_tower.6.bias                        of shape (256,)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.6.weight                      loaded from rpn.head.cls_tower.6.weight                      of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.7.bias                        loaded from rpn.head.cls_tower.7.bias                        of shape (256,)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.7.weight                      loaded from rpn.head.cls_tower.7.weight                      of shape (256,)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.9.bias                        loaded from rpn.head.cls_tower.9.bias                        of shape (256,)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.cls_tower.9.weight                      loaded from rpn.head.cls_tower.9.weight                      of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.0.bias                        loaded from rpn.head.dna_tower.0.bias                        of shape (256,)
+2019-12-27 03:17:34,129 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.0.weight                      loaded from rpn.head.dna_tower.0.weight                      of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.1.bias                        loaded from rpn.head.dna_tower.1.bias                        of shape (256,)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.1.weight                      loaded from rpn.head.dna_tower.1.weight                      of shape (256,)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.10.bias                       loaded from rpn.head.dna_tower.10.bias                       of shape (256,)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.10.weight                     loaded from rpn.head.dna_tower.10.weight                     of shape (256,)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.3.bias                        loaded from rpn.head.dna_tower.3.bias                        of shape (256,)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.3.weight                      loaded from rpn.head.dna_tower.3.weight                      of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.4.bias                        loaded from rpn.head.dna_tower.4.bias                        of shape (256,)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.4.weight                      loaded from rpn.head.dna_tower.4.weight                      of shape (256,)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.6.bias                        loaded from rpn.head.dna_tower.6.bias                        of shape (256,)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.6.weight                      loaded from rpn.head.dna_tower.6.weight                      of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.7.bias                        loaded from rpn.head.dna_tower.7.bias                        of shape (256,)
+2019-12-27 03:17:34,130 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.7.weight                      loaded from rpn.head.dna_tower.7.weight                      of shape (256,)
+2019-12-27 03:17:34,131 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.9.bias                        loaded from rpn.head.dna_tower.9.bias                        of shape (256,)
+2019-12-27 03:17:34,131 fcos_core.utils.model_serialization INFO: rpn.head.dna_tower.9.weight                      loaded from rpn.head.dna_tower.9.weight                      of shape (256, 256, 3, 3)
+2019-12-27 03:17:34,131 fcos_core.utils.model_serialization INFO: rpn.head.identity.bias                           loaded from rpn.head.identity.bias                           of shape (64,)
+2019-12-27 03:17:34,131 fcos_core.utils.model_serialization INFO: rpn.head.identity.weight                         loaded from rpn.head.identity.weight                         of shape (64, 256, 3, 3)
+2019-12-27 03:17:34,131 fcos_core.utils.model_serialization INFO: rpn.head.scales.0.scale                          loaded from rpn.head.scales.0.scale                          of shape (1,)
+2019-12-27 03:17:34,131 fcos_core.utils.model_serialization INFO: rpn.head.scales.1.scale                          loaded from rpn.head.scales.1.scale                          of shape (1,)
+2019-12-27 03:17:34,131 fcos_core.utils.model_serialization INFO: rpn.head.scales.2.scale                          loaded from rpn.head.scales.2.scale                          of shape (1,)
+2019-12-27 03:17:34,131 fcos_core.utils.model_serialization INFO: rpn.head.scales.3.scale                          loaded from rpn.head.scales.3.scale                          of shape (1,)
+2019-12-27 03:17:34,131 fcos_core.utils.model_serialization INFO: rpn.head.scales.4.scale                          loaded from rpn.head.scales.4.scale                          of shape (1,)
+loading annotations into memory...
+loading annotations into memory...
+loading annotations into memory...
+loading annotations into memory...
+Done (t=0.66s)
+creating index...
+Done (t=0.65s)
+creating index...
+Done (t=0.56s)
+creating index...
+index created!
+index created!
+index created!
+Done (t=0.69s)
+creating index...
+2019-12-27 03:17:35,277 fcos_core.inference INFO: Start evaluation on coco_2014_minival dataset(5000 images).
+index created!
+loading annotations into memory...
+loading annotations into memory...
+loading annotations into memory...
+loading annotations into memory...
+Done (t=0.55s)
+creating index...
+index created!
+Done (t=0.54s)
+creating index...
+Done (t=0.57s)
+creating index...
+index created!
+index created!
+Done (t=0.56s)
+creating index...
+index created!
+2019-12-27 03:20:18,496 fcos_core.inference INFO: Total run time: 0:02:43.218764 (0.2611500225067139 s / img per device, on 8 devices)
+2019-12-27 03:20:18,496 fcos_core.inference INFO: Model inference time: 0:02:38.506284 (0.25361005477905274 s / img per device, on 8 devices)
+2019-12-27 03:20:23,734 fcos_core.inference INFO: Preparing results for COCO format
+2019-12-27 03:20:23,736 fcos_core.inference INFO: Preparing bbox results
+2019-12-27 03:20:25,924 fcos_core.inference INFO: Evaluating predictions
+Loading and preparing results...
+DONE (t=3.24s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=52.14s).
+Accumulating evaluation results...
+DONE (t=10.51s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.329
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.504
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.356
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.193
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.369
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.411
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.293
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.492
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.526
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.324
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.571
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.671
+Maximum f-measures for classes:
+[0.74226110898617337, 0.51979912003910944, 0.6156255189921469, 0.61677012640313911, 0.7883211678832116, 0.73126419379258145, 0.74703406046689624, 0.46921505690107967, 0.47582697201017815, 0.5237062518695782, 0.79583666933546848, 0.71332586786114216, 0.50467289719626174, 0.3036227717078781, 0.53033045110262078, 0.81957837334574724, 0.7187408157267412, 0.65209131596741465, 0.63707571801566576, 0.65864496087452318, 0.79855099736544977, 0.80694624053205255, 0.85781092898730349, 0.83878241262683206, 0.307974335472044, 0.58573125057093278, 0.28095733610822066, 0.50995539114350996, 0.50081833060556469, 0.76688344172086043, 0.41264822134387352, 0.41464855286473717, 0.59542879468646226, 0.5607971745711402, 0.48637602179836514, 0.59482758620689657, 0.66295405644855088, 0.53901114604172617, 0.67775049313634717, 0.5256732495511669, 0.54168057536491365, 0.53483843657400876, 0.38586572438162542, 0.30434782608695654, 0.28945835760046595, 0.52964366069883284, 0.41553421513559224, 0.345221971407073, 0.43902439024390238, 0.43701202785397764, 0.43833017077798858, 0.35423512842867677, 0.46524650030432135, 0.62680115273775205, 0.52547021943573657, 0.44589992140424417, 0.41970000328223983, 0.54583333333333328, 0.47948547349744958, 0.55276381909547745, 0.43934943039335106, 0.69859154929577472, 0.63742592158569666, 0.65070213292773516, 0.75244299674267101, 0.43229108712584846, 0.61675977653631286, 0.50357550005181884, 0.71027397260273972, 0.46111322912695391, 0.35106382978723399, 0.52565920045364334, 0.60389316432775009, 0.34924087342204024, 0.67465056317003658, 0.50840635612762575, 0.38434163701067614, 0.63146661246061597, 0.14173228346456693, 0.26641294005708849]
+Score thresholds for classes (used in demos for visualization purposes):
+[0.51632487773895264, 0.50769555568695068, 0.50874322652816772, 0.50061041116714478, 0.51296627521514893, 0.435240238904953, 0.54032337665557861, 0.42972525954246521, 0.46724611520767212, 0.48009267449378967, 0.5607987642288208, 0.51804351806640625, 0.46542787551879883, 0.4252663254737854, 0.49819716811180115, 0.53002351522445679, 0.57552164793014526, 0.53770291805267334, 0.48312640190124512, 0.46704843640327454, 0.45364680886268616, 0.52438092231750488, 0.5105363130569458, 0.55273085832595825, 0.45050367712974548, 0.47261726856231689, 0.43773844838142395, 0.47157573699951172, 0.45532214641571045, 0.50140303373336792, 0.49333852529525757, 0.47159186005592346, 0.55476397275924683, 0.49786907434463501, 0.54487049579620361, 0.55021119117736816, 0.56516444683074951, 0.47820389270782471, 0.50496912002563477, 0.50670278072357178, 0.48557710647583008, 0.41324517130851746, 0.46478262543678284, 0.44418737292289734, 0.46781384944915771, 0.56601047515869141, 0.48062625527381897, 0.52526253461837769, 0.46378818154335022, 0.55301791429519653, 0.48635795712471008, 0.46372202038764954, 0.45903223752975464, 0.42333608865737915, 0.50359642505645752, 0.438396155834198, 0.47933006286621094, 0.42684227228164673, 0.49357789754867554, 0.4589570164680481, 0.48004475235939026, 0.5745779275894165, 0.50165891647338867, 0.48522090911865234, 0.45841646194458008, 0.49393874406814575, 0.51478546857833862, 0.47740516066551208, 0.50421428680419922, 0.4222552478313446, 0.42319709062576294, 0.49085894227027893, 0.56562697887420654, 0.43963578343391418, 0.57387816905975342, 0.52713584899902344, 0.5055268406867981, 0.54077476263046265, 0.472942054271698, 0.47320011258125305]
+2019-12-27 03:21:39,666 fcos_core.inference INFO: OrderedDict([('bbox', OrderedDict([('AP', 0.3291604704883932), ('AP50', 0.50444440741446195), ('AP75', 0.35571388050746922), ('APs', 0.19250959857191988), ('APm', 0.3686144486270202), ('APl', 0.41106850449268451)]))])
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************

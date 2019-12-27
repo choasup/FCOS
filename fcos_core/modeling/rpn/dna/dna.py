@@ -23,9 +23,11 @@ class DNAHead(torch.nn.Module):
         self.norm_reg_targets = cfg.MODEL.DNA.NORM_REG_TARGETS
         self.centerness_on_reg = cfg.MODEL.DNA.CENTERNESS_ON_REG
         self.use_dcn_in_tower = cfg.MODEL.DNA.USE_DCN_IN_TOWER
+        self.hash_code = cfg.MODEL.DNA.HASH_CODE
 
         cls_tower = []
         bbox_tower = []
+        dna_tower = []
 
         for i in range(cfg.MODEL.DNA.NUM_CONVS):
             if self.use_dcn_in_tower and \
@@ -34,6 +36,7 @@ class DNAHead(torch.nn.Module):
             else:
                 conv_func = nn.Conv2d
 
+            # Cls tower
             cls_tower.append(
                 conv_func(
                     in_channels,
@@ -46,6 +49,8 @@ class DNAHead(torch.nn.Module):
             )
             cls_tower.append(nn.GroupNorm(32, in_channels))
             cls_tower.append(nn.ReLU())
+          
+            # BBox tower
             bbox_tower.append(
                 conv_func(
                     in_channels,
@@ -59,29 +64,48 @@ class DNAHead(torch.nn.Module):
             bbox_tower.append(nn.GroupNorm(32, in_channels))
             bbox_tower.append(nn.ReLU())
 
+            # DNA tower 
+            dna_tower.append(
+                conv_func(
+                    in_channels,
+                    in_channels,
+                    kernel_size=3,
+                    stride=1,
+                    padding=1,
+                    bias=True
+                )
+            )
+            dna_tower.append(nn.GroupNorm(32, in_channels))
+            dna_tower.append(nn.ReLU())
+
+
         self.add_module('cls_tower', nn.Sequential(*cls_tower))
         self.add_module('bbox_tower', nn.Sequential(*bbox_tower))
+        self.add_module('dna_tower', nn.Sequential(*dna_tower))
+
         self.cls_logits = nn.Conv2d(
             in_channels, num_classes, kernel_size=3, stride=1,
             padding=1
         )
-
-        
     
         self.bbox_pred = nn.Conv2d(
             in_channels, 4, kernel_size=3, stride=1,
             padding=1
         )
         
-
         self.centerness = nn.Conv2d(
             in_channels, 1, kernel_size=3, stride=1,
             padding=1
         )
 
+        # For DNA. way 2.
+        self.identity = nn.Conv2d(
+            in_channels, self.hash_code, kernel_size=3,
+            stride=1, padding=1)
+    
         # initialization
-        for modules in [self.cls_tower, self.bbox_tower,
-                        self.cls_logits, self.bbox_pred,
+        for modules in [self.cls_tower, self.bbox_tower, self.dna_tower,
+                        self.cls_logits, self.bbox_pred, self.identity,
                         self.centerness]:
             for l in modules.modules():
                 if isinstance(l, nn.Conv2d):
@@ -123,20 +147,6 @@ class DNAHead(torch.nn.Module):
                     torch.nn.init.constant_(l.bias, 0)
         """
     
-        # For DNA. way 2.
-        self.hash_code = 128
-        
-        self.identity = nn.Conv2d(
-            in_channels, self.hash_code, kernel_size=3, 
-            stride=1, padding=1)
-
-        # NOTE need to init params.
-        for modules in [self.identity]:
-            for l in modules.modules():
-                if isinstance(l, nn.Conv2d):
-                    torch.nn.init.normal_(l.weight, std=0.01)
-                    torch.nn.init.constant_(l.bias, 0)  
-
     def forward(self, x):
         logits = []
         bbox_reg = []
@@ -145,6 +155,7 @@ class DNAHead(torch.nn.Module):
         for l, feature in enumerate(x):
             cls_tower = self.cls_tower(feature)
             box_tower = self.bbox_tower(feature)
+            dna_tower = self.dna_tower(feature)
 
             logits.append(self.cls_logits(cls_tower))
             if self.centerness_on_reg:
@@ -153,7 +164,7 @@ class DNAHead(torch.nn.Module):
                 centerness.append(self.centerness(cls_tower))
 
             if True:
-                identity.append(self.identity(box_tower))
+                identity.append(self.identity(dna_tower))
 
             bbox_pred = self.scales[l](self.bbox_pred(box_tower))
             if self.norm_reg_targets:
@@ -216,7 +227,8 @@ class DNAModule(torch.nn.Module):
         else:
             return self._forward_test(
                 locations, box_cls, box_regression, 
-                centerness, images.image_sizes
+                centerness, identity,
+                images.image_sizes
             )
 
     def _forward_train(self, locations, box_cls, box_regression, centerness, identity, targets):
@@ -231,10 +243,10 @@ class DNAModule(torch.nn.Module):
         }
         return None, losses
 
-    def _forward_test(self, locations, box_cls, box_regression, centerness, image_sizes):
+    def _forward_test(self, locations, box_cls, box_regression, centerness, identity, image_sizes):
         boxes = self.box_selector_test(
             locations, box_cls, box_regression, 
-            centerness, image_sizes
+            centerness, identity, image_sizes
         )
         return boxes, {}
 

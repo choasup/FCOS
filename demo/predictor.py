@@ -170,6 +170,7 @@ class COCODemo(object):
                 the BoxList via `prediction.fields()`
         """
         predictions = self.compute_prediction(image)
+
         top_predictions = self.select_top_predictions(predictions)
 
         result = image.copy()

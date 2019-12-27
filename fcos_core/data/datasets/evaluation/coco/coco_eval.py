@@ -21,6 +21,7 @@ def do_coco_evaluation(
 ):
     logger = logging.getLogger("fcos_core.inference")
 
+    """
     if box_only:
         logger.info("Evaluating bbox proposals")
         areas = {"all": "", "small": "s", "medium": "m", "large": "l"}
@@ -37,6 +38,8 @@ def do_coco_evaluation(
         if output_folder:
             torch.save(res, os.path.join(output_folder, "box_proposals.pth"))
         return
+    """
+
     logger.info("Preparing results for COCO format")
     coco_results = {}
     if "bbox" in iou_types:
