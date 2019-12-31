@@ -3,6 +3,7 @@
 * check about loss identity
 * check about hash sample
 * check about locations using
+* how to using postion normalization
 
 ## Experiments
 
