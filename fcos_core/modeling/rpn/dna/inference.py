@@ -64,6 +64,12 @@ class FCOSPostProcessor(torch.nn.Module):
         box_regression = box_regression.view(N, 4, H, W).permute(0, 2, 3, 1)
         box_regression = box_regression.reshape(N, -1, 4)
         centerness = centerness.view(N, 1, H, W).permute(0, 2, 3, 1)
+        
+        if True:
+            centermap = []
+            for per_center in centerness:
+                centermap.append(per_center)
+
         centerness = centerness.reshape(N, -1).sigmoid()
         
         # NOTE. get identity
@@ -127,7 +133,7 @@ class FCOSPostProcessor(torch.nn.Module):
             boxlist = remove_small_boxes(boxlist, self.min_size)
             results.append(boxlist)
 
-        return results
+        return results, centermap
 
     def forward(self, locations, box_cls, box_regression, centerness, identity, image_sizes):
         """
@@ -141,20 +147,22 @@ class FCOSPostProcessor(torch.nn.Module):
                 applying box decoding and NMS
         """
         sampled_boxes = []
+        center_maps = []
         for _, (l, o, b, c, i) in enumerate(zip(locations, box_cls, box_regression, centerness, identity)):
-            sampled_boxes.append(
-                self.forward_for_single_feature_map(
-                    l, o, b, c, i, image_sizes
-                )
+            boxes, maps = self.forward_for_single_feature_map(
+                l, o, b, c, i, image_sizes
             )
+            sampled_boxes.append(boxes)
+            center_maps.append(maps)
 
         boxlists = list(zip(*sampled_boxes))
         boxlists = [cat_boxlist(boxlist) for boxlist in boxlists]
-
+        
         if not self.bbox_aug_enabled:
             boxlists = self.select_over_all_levels(boxlists)
-       
+     
         return boxlists
+        #return boxlists, center_maps
 
     # NOTE add dna identity, delete nms here
     # TODO very similar to filter_results from PostProcessor
@@ -167,7 +175,7 @@ class FCOSPostProcessor(torch.nn.Module):
 
         for i in range(num_images):
             # multiclass nms
-            if False:
+            if True:
                 result = boxlist_ml_nms(boxlists[i], self.nms_thresh)
             else:
                 result = dna_nms(boxlists[i], self.nms_thresh)

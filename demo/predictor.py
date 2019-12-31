@@ -169,13 +169,22 @@ class COCODemo(object):
                 of the detection properties can be found in the fields of
                 the BoxList via `prediction.fields()`
         """
-        predictions = self.compute_prediction(image)
+        if False:
+            predictions, center_maps = self.compute_prediction(image)
+        else:
+            predictions = self.compute_prediction(image)
 
         top_predictions = self.select_top_predictions(predictions)
 
         result = image.copy()
+        
+        # for centerness
+        if False:
+            result = self.overlay_centerness(result, center_maps)
+
         if self.show_mask_heatmaps:
             return self.create_mask_montage(result, top_predictions)
+            
         result = self.overlay_boxes(result, top_predictions)
         if self.cfg.MODEL.MASK_ON:
             result = self.overlay_mask(result, top_predictions)
@@ -203,7 +212,8 @@ class COCODemo(object):
         image_list = image_list.to(self.device)
         # compute predictions
         with torch.no_grad():
-            predictions = self.model(image_list)
+            predictions, center_maps = self.model(image_list)
+
         predictions = [o.to(self.cpu_device) for o in predictions]
 
         # always single image is passed at a time
@@ -220,7 +230,8 @@ class COCODemo(object):
             # always single image is passed at a time
             masks = self.masker([masks], [prediction])[0]
             prediction.add_field("mask", masks)
-        return prediction
+
+        return prediction, center_maps
 
     def select_top_predictions(self, predictions):
         """
@@ -346,6 +357,17 @@ class COCODemo(object):
                 end_x = (x + 1) * width
                 result[start_y:end_y, start_x:end_x] = masks[y, x]
         return cv2.applyColorMap(result.numpy(), cv2.COLORMAP_JET)
+
+    def overlay_centerness(self, image, maps):
+        masks = maps[0][0].sigmoid().cpu().permute(2, 0, 1)
+        src = cv2.resize(image, (masks.shape[2], masks.shape[1]))
+
+        for y in range(masks.shape[1]):
+            for x in range(masks.shape[2]):
+                ratio = masks[0, y, x]
+                src[y, x] = np.array([int(ratio * 255), 0, int((1 - ratio) * 255)], dtype=np.int8)
+
+        return cv2.resize(src, (image.shape[1], image.shape[0]))
 
     def overlay_class_names(self, image, predictions):
         """

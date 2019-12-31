@@ -101,7 +101,7 @@ def main():
         composite = coco_demo.run_on_opencv_image(img)
         print("{}\tinference time: {:.2f}s".format(im_name, time.time() - start_time))
         #cv2.imshow(im_name, composite)
-        cv2.imwrite("./demo/vis/demo_{}.png".format(im_name), composite)
+        cv2.imwrite("./demo/vis/demo_{}".format(im_name), composite)
     print("Press any keys to exit ...")
     #cv2.waitKey()
     #cv2.destroyAllWindows()

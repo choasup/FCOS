@@ -64,6 +64,7 @@ class DNAHead(torch.nn.Module):
             bbox_tower.append(nn.GroupNorm(32, in_channels))
             bbox_tower.append(nn.ReLU())
 
+            """
             # DNA tower 
             dna_tower.append(
                 conv_func(
@@ -77,11 +78,11 @@ class DNAHead(torch.nn.Module):
             )
             dna_tower.append(nn.GroupNorm(32, in_channels))
             dna_tower.append(nn.ReLU())
-
+            """
 
         self.add_module('cls_tower', nn.Sequential(*cls_tower))
         self.add_module('bbox_tower', nn.Sequential(*bbox_tower))
-        self.add_module('dna_tower', nn.Sequential(*dna_tower))
+        #self.add_module('dna_tower', nn.Sequential(*dna_tower))
 
         self.cls_logits = nn.Conv2d(
             in_channels, num_classes, kernel_size=3, stride=1,
@@ -100,11 +101,11 @@ class DNAHead(torch.nn.Module):
 
         # For DNA. way 2.
         self.identity = nn.Conv2d(
-            in_channels, self.hash_code, kernel_size=3,
+            6, self.hash_code, kernel_size=3,
             stride=1, padding=1)
     
         # initialization
-        for modules in [self.cls_tower, self.bbox_tower, self.dna_tower,
+        for modules in [self.cls_tower, self.bbox_tower,
                         self.cls_logits, self.bbox_pred, self.identity,
                         self.centerness]:
             for l in modules.modules():
@@ -152,10 +153,14 @@ class DNAHead(torch.nn.Module):
         bbox_reg = []
         centerness = []
         identity = []
+        
+        # for dna
+        locations = self.compute_locations(x)
+
         for l, feature in enumerate(x):
             cls_tower = self.cls_tower(feature)
             box_tower = self.bbox_tower(feature)
-            dna_tower = self.dna_tower(feature)
+            #dna_tower = self.dna_tower(feature)
 
             logits.append(self.cls_logits(cls_tower))
             if self.centerness_on_reg:
@@ -163,10 +168,18 @@ class DNAHead(torch.nn.Module):
             else:
                 centerness.append(self.centerness(cls_tower))
 
-            if True:
                 identity.append(self.identity(dna_tower))
-
+ 
             bbox_pred = self.scales[l](self.bbox_pred(box_tower))
+
+            fpn_loc = locations[l].reshape(bbox_pred.shape[2], bbox_pred.shape[3], -1) \
+                      .permute(2, 0, 1) \
+                      .unsqueeze(0) \
+                      .repeat(bbox_pred.shape[0], 1, 1, 1)
+
+            identity_tower = torch.cat([fpn_loc, bbox_pred], 1)
+            identity.append(self.identity(identity_tower))
+
             if self.norm_reg_targets:
                 bbox_pred = F.relu(bbox_pred)
                 if self.training:
@@ -177,6 +190,35 @@ class DNAHead(torch.nn.Module):
                 bbox_reg.append(torch.exp(bbox_pred))
 
         return logits, bbox_reg, centerness, identity
+
+    # NOTE.
+    # for DNA, embedding locations
+    def compute_locations(self, features):
+        
+        locations = []
+        for level, feature in enumerate(features):
+            h, w = feature.size()[-2:]
+            locations_per_level = self.compute_locations_per_level(
+                h, w, self.fpn_strides[level],
+                feature.device
+            )
+            locations.append(locations_per_level)
+        return locations
+
+    def compute_locations_per_level(self, h, w, stride, device):
+        shifts_x = torch.arange(
+            0, w * stride, step=stride,
+            dtype=torch.float32, device=device
+        )
+        shifts_y = torch.arange(
+            0, h * stride, step=stride,
+            dtype=torch.float32, device=device
+        )
+        shift_y, shift_x = torch.meshgrid(shifts_y, shifts_x)
+        shift_x = shift_x.reshape(-1)
+        shift_y = shift_y.reshape(-1)
+        locations = torch.stack((shift_x, shift_y), dim=1) + stride // 2
+        return locations
 
 
 class DNAModule(torch.nn.Module):
